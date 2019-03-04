@@ -6,7 +6,7 @@ This R package fits latent dirichlet allocation models to data using the stochas
 
 ## Non-R Dependencies
 
-* A C++ compiler with a reasonably modern version of the standard library.
+* A C++ compiler supporting C++11.
 
 ## Philosophy
 
