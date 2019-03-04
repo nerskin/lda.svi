@@ -11,9 +11,9 @@
 #' @export
 lda_online <- function(dtm,passes=1,batchsize=256,K,eta=1,alpha=1,kappa=0.7,tau_0=1024){
   
-	docs <- dplyr::pull(dtm,document)
-	terms <- dplyr::pull(dtm,term)
-	counts <- dplyr::pull(dtm,n)
+	docs <- dtm[[1]]
+	terms <- dtm[[2]]
+	counts <- dtm[[3]]
 
 	doc_ids <- seq(0,length(unique(docs)))
 	names(doc_ids) <- unique(docs)
