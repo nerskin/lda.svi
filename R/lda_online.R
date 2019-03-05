@@ -11,8 +11,6 @@
 #' @export
 
 lda_online <- function(dtm,passes=1,batchsize=256,K,eta=1,alpha=1,kappa=0.7,tau_0=1024){
-  
-	#TODO: rely on names rather than column positions
 	docs <- dtm[[1]]
 	terms <- dtm[[2]]
 	counts <- dtm[[3]]
