@@ -26,5 +26,6 @@ devtools::install_github("nerskin/lda.svi")
 
 * Check that the output makes sense 
 * Tidy the output
+* Switch to row-major format, or possibly transpose everythin 
 * Add documentation/vignette
 * Submit to CRAN
