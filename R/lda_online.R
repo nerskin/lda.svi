@@ -10,7 +10,7 @@
 #' @param K The number of topics
 #' @export
 
-lda_online <- function(dtm,passes=1,batchsize=256,K,eta=1,alpha=1,kappa=0.7,tau_0=1024){
+lda_online <- function(dtm,passes=1,batchsize=256,K,eta=1/K,alpha=1/K,kappa=0.7,tau_0=1024){
 	docs <- dtm[[1]]
 	terms <- dtm[[2]]
 	counts <- dtm[[3]]
@@ -21,8 +21,8 @@ lda_online <- function(dtm,passes=1,batchsize=256,K,eta=1,alpha=1,kappa=0.7,tau_
 	term_ids <- seq(0,length(unique(terms)))
 	names(term_ids) <- unique(terms)
 	
-	cat('launching cpp code')
-	res_list <- lda_online_cpp(doc_ids[docs],term_ids[terms],counts,K,passes,batchsize)
+	cat('launching cpp code\n')
+	res_list <- lda_online_cpp(doc_ids[docs],term_ids[terms],counts,K,passes,batchsize,eta=eta,alpha=alpha,tau_0=tau_0,kappa=kappa)
 
 	gamma <- res_list$Gamma
 	lambda <- res_list$Lambda
@@ -37,8 +37,16 @@ lda_online <- function(dtm,passes=1,batchsize=256,K,eta=1,alpha=1,kappa=0.7,tau_
 	# (this follows from equation 2 in the paper)
 	# Noting that the expectation of a Dirichlet(a) rv is a/sum(a)	
 
-	theta <- apply(gamma,MARGIN=1,FUN=function(x)x/sum(x)) 
-	beta <- apply(lambda,MARGIN=2,FUN=function(x)x/sum(x))
+	theta <- gamma
+	beta <- lambda
 	
-	list('theta'=theta,'beta'=beta)#TODO: tidy output 
+	for (i in seq(1,nrow(gamma))){
+	  theta[i,] <- theta[i,]/sum(theta[i,])
+	}
+	
+	for (i in seq(1,nrow(lambda))){
+	  beta[i,] <- lambda[i,]/sum(lambda[i,])
+	}
+	
+	list('theta'=theta,'beta'=beta,'lambda'=lambda,'gamma'=gamma)#TODO: tidy output 
 }

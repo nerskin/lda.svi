@@ -21,11 +21,14 @@ struct LDA_State{
 	int K;//The number of topics we're fitting
 	int t;//how many minibatches we've processed so far
 
+	double eta;
+	double alpha;
+
 	// Data
 	std::unordered_map<int,std::unordered_map<int,int>> dtm;
 
 	public:
-		LDA_State(int D,int V,int K,std::unordered_map<int,std::unordered_map<int,int>>);
+		LDA_State(int D,int V,int K,std::unordered_map<int,std::unordered_map<int,int>>,double eta,double alpha);
 		void update_minibatch(std::vector<int> documents);
 		void fit_model(int passes,int batchsize,double tau_0,double kappa);
 		void update_minibatch(std::vector<int> docs,double tau_0,double kappa);//this could probably be private

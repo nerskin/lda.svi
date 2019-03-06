@@ -16,13 +16,16 @@
 
 using namespace std;
 
-LDA_State::LDA_State(int n_docs,int vocab_size,int n_topics,std::unordered_map<int,std::unordered_map<int,int> > data){
+LDA_State::LDA_State(int n_docs,int vocab_size,int n_topics,std::unordered_map<int,std::unordered_map<int,int> > data,double eta_val,double alpha_val){
 	D=n_docs;
 	V=vocab_size;
 	K=n_topics;
 	dtm = data;
 
 	t=0;
+
+	eta = eta_val;
+	alpha = alpha_val;
 
 	gamma = arma::mat(D,K);
 	lambda = arma::mat(K,V);
@@ -47,11 +50,8 @@ void LDA_State::update_minibatch(std::vector<int> documents,double tau_0,double 
 	t++;
 
 	int batchsize = documents.size();
-	double alpha = 1;//TODO: these should be parameters	
-	double eta = 1;
 	double rho_t = std::pow((tau_0+t),-kappa);
 
-	//cout << "rho t" << rho_t  << endl;
 
 	arma::mat sufficient_statistics(K,V);
 
@@ -84,6 +84,7 @@ void LDA_State::update_minibatch(std::vector<int> documents,double tau_0,double 
 	arma::mat sufficient_stats = arma::zeros(K,V);
 
 
+
 	for (auto doc_id : documents){
 		std::vector<int> word_ids;
 		std::vector<int> word_cts;
@@ -100,7 +101,10 @@ void LDA_State::update_minibatch(std::vector<int> documents,double tau_0,double 
 		  word_cts_vec[i] = static_cast<double>(word_cts[i]);
 		}
 		
-	  arma::rowvec gamma_d = gamma.row(doc_id);
+	  arma::rowvec gamma_d(K);
+	  for (double &elem:gamma_d){
+		elem = R::rgamma(100,0.01);
+	  }
 	  arma::rowvec Elogtheta_d = Elogtheta.row(indices[doc_id]);
     	  arma::rowvec expElogtheta_d = expElogtheta.row(indices[doc_id]);
 	
@@ -121,10 +125,6 @@ void LDA_State::update_minibatch(std::vector<int> documents,double tau_0,double 
 		  Elogtheta_d = dirichlet_expectation(gamma_d);
 		  expElogtheta_d = arma::exp(Elogtheta_d);
 
-		  //cout << phinorm << endl;
-
-		  //std::this_thread::sleep_for(std::chrono::milliseconds(250));
-
 		  phinorm = expElogtheta_d * expElogbeta_d + 1e-100;
 
 		 
@@ -141,11 +141,8 @@ void LDA_State::update_minibatch(std::vector<int> documents,double tau_0,double 
 
 	gamma.row(doc_id) = gamma_d;
 
-	
-
-	arma::mat suff_stats_old(sufficient_statistics);
-
 	sufficient_statistics.cols(word_indices) += expElogtheta_d.t()*(word_cts_vec/phinorm);
+	//std::this_thread::sleep_for(std::chrono::milliseconds(250));
 
 	sufficient_statistics = sufficient_statistics % expElogbeta;
 	}
@@ -159,8 +156,6 @@ void LDA_State::update_minibatch(std::vector<int> documents,double tau_0,double 
 		Elogbeta.row(i) = dirichlet_expectation(lambda.row(i));
 		expElogbeta.row(i) = arma::exp(Elogbeta.row(i));
 	}
-	
-	cout << "reached end of update function" << '\n';
 }
 
 void LDA_State::fit_model(int passes,int batchsize,double tau_0,double kappa){
@@ -191,13 +186,6 @@ void LDA_State::fit_model(int passes,int batchsize,double tau_0,double kappa){
 			}
 		}
 	}
-}
+	
 
-// [[Rcpp::export]]
-void test(){
-	unordered_map<int,unordered_map<int,int> > data;
-	LDA_State lda(100,100,100,data);
-	cout << "created object" << endl;
-	lda.fit_model(1000,1,10,0.75);
-	cout << "model fit complete" << endl;
 }
