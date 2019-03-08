@@ -1,12 +1,10 @@
-
-
 ```{r}
 library(tidyverse)
 library(lda.svi)
 ```
 
 ```{r,cache=TRUE}
-bench::system_time(lda_fit <- lda_online(reddit_tidy[,c(2,1,3)],K=25,passes=10,kappa=0.5,tau_0=4096))
+bench::system_time(lda_fit <- lda_online(reddit_tidy[,c(2,1,3)],K=30,passes=1))
 ```
 
 At this point it's quite clear that this implementation isn't doing quite the same thing as the python one
@@ -21,7 +19,8 @@ theta <- lda_fit$theta %>% as.data.frame() %>% rownames_to_column('document') %>
 ```{r}
 beta %>%
   group_by(topic) %>%
-  top_n(beta,n=6) %>%
+  arrange(desc(beta)) %>%
+  filter(row_number() <= 15) %>%
   arrange(desc(beta)) %>%
   ggplot(aes(term,beta)) +
     geom_col() + 

@@ -165,6 +165,8 @@ void LDA_State::update_minibatch(std::vector<int> documents,double tau_0,double 
 		Elogbeta.row(i) = dirichlet_expectation(lambda.row(i));
 		expElogbeta.row(i) = arma::exp(Elogbeta.row(i));
 	}
+	
+	cout << "finished update function " << t << endl;
 }
 
 void LDA_State::fit_model(int passes,int batchsize,double tau_0,double kappa){
