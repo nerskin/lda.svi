@@ -16,7 +16,7 @@
 
 using namespace std;
 
-LDA_State::LDA_State(int n_docs,int vocab_size,int n_topics,std::unordered_map<int,std::unordered_map<int,int> > data,double eta_val,double alpha_val){
+LDA_State::LDA_State(int n_docs,int vocab_size,int n_topics,std::unordered_map<int,std::unordered_map<int,int>> &data,double eta_val,double alpha_val){
 	D=n_docs;
 	V=vocab_size;
 	K=n_topics;
@@ -89,13 +89,13 @@ void LDA_State::update_minibatch(std::vector<int> documents,double tau_0,double 
 		std::vector<int> word_ids;
 		std::vector<int> word_cts;
 		
+
 		unordered_map<int,int> word_count_map  = dtm[doc_id];
 		for (pair<int,int> index : word_count_map){
 			word_ids.push_back(index.first);
 			word_cts.push_back(index.second);
 		}
-
-
+		
 		arma::rowvec word_cts_vec(word_cts.size());
 		for (int i=0;i<word_cts.size();i++){
 		  word_cts_vec[i] = static_cast<double>(word_cts[i]);
@@ -119,7 +119,10 @@ void LDA_State::update_minibatch(std::vector<int> documents,double tau_0,double 
 
 
 		for (int i = 0;i<100;i++){
-		  Rcpp::checkUserInterrupt();
+		  //cout << phinorm << endl;
+		  
+		  //cout << (word_cts_vec/phinorm) << endl;
+		  
 		  arma::rowvec gamma_d_old = gamma_d;
 		  gamma_d = alpha + (expElogtheta_d % ((word_cts_vec/phinorm) * expElogbeta_d.t()));
 		  Elogtheta_d = dirichlet_expectation(gamma_d);
@@ -138,11 +141,12 @@ void LDA_State::update_minibatch(std::vector<int> documents,double tau_0,double 
 		  cout << "\a" << endl;
 		  }
 		}
+		Rcpp::checkUserInterrupt();
+		
 
 	gamma.row(doc_id) = gamma_d;
 
 	sufficient_statistics.cols(word_indices) += expElogtheta_d.t()*(word_cts_vec/phinorm);
-	//std::this_thread::sleep_for(std::chrono::milliseconds(250));
 
 	sufficient_statistics = sufficient_statistics % expElogbeta;
 	}
@@ -167,10 +171,12 @@ void LDA_State::fit_model(int passes,int batchsize,double tau_0,double kappa){
 			docs.push_back(j);
 		}
 
-
+		/**
 		unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
 		shuffle(docs.begin(), docs.end(), std::default_random_engine(seed));
+		**/
 		
+		int batches=0;
 		while (!docs.empty()){
 			if (docs.size() >= batchsize){
 				std::vector<int> minibatch(docs.end() - batchsize,docs.end());
@@ -184,7 +190,12 @@ void LDA_State::fit_model(int passes,int batchsize,double tau_0,double kappa){
 				docs.erase(docs.begin(),docs.end());
 	
 			}
+			batches++;
+			if (batches % 1000 == 0){
+			  cout << "Processed " << batches << "minibatches" << endl; 
+			}
 		}
+		cout << "Finished a pass" << endl;
 	}
 	
 
