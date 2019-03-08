@@ -21,7 +21,7 @@ LDA_State::LDA_State(int n_docs,int vocab_size,int n_topics,std::unordered_map<i
 	V=vocab_size;
 	K=n_topics;
 	dtm = data;
-
+	
 	t=0;
 
 	eta = eta_val;
@@ -67,7 +67,6 @@ void LDA_State::update_minibatch(std::vector<int> documents,double tau_0,double 
 		}
 	}
 
-	//cout << gamma.row(documents[0]);
 
 
 
@@ -96,10 +95,13 @@ void LDA_State::update_minibatch(std::vector<int> documents,double tau_0,double 
 			word_cts.push_back(index.second);
 		}
 		
+    
+		
 		arma::rowvec word_cts_vec(word_cts.size());
 		for (int i=0;i<word_cts.size();i++){
 		  word_cts_vec[i] = static_cast<double>(word_cts[i]);
 		}
+		
 		
 	  arma::rowvec gamma_d(K);
 	  for (double &elem:gamma_d){
@@ -112,17 +114,16 @@ void LDA_State::update_minibatch(std::vector<int> documents,double tau_0,double 
 	  for (int i=0;i<word_ids.size();i++){
 	    word_indices[i] = static_cast<unsigned int>(word_ids[i]);//is this right?
 	  }
-	
+	  
 	  arma::mat expElogbeta_d = expElogbeta.cols(word_indices);
 
 	  arma::rowvec phinorm = expElogtheta_d * expElogbeta_d + 1e-100;
 
 
 		for (int i = 0;i<100;i++){
-		  //cout << phinorm << endl;
-		  
-		  //cout << (word_cts_vec/phinorm) << endl;
-		  
+		  Rcpp::checkUserInterrupt();
+
+		  //std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		  arma::rowvec gamma_d_old = gamma_d;
 		  gamma_d = alpha + (expElogtheta_d % ((word_cts_vec/phinorm) * expElogbeta_d.t()));
 		  Elogtheta_d = dirichlet_expectation(gamma_d);
@@ -134,6 +135,7 @@ void LDA_State::update_minibatch(std::vector<int> documents,double tau_0,double 
 
 		  mean_abs_change = arma::mean(arma::abs(gamma_d - gamma_d_old));
 		  if (mean_abs_change < 0.001){
+		    cout << i << endl;
 		    break;
 		  }
 		  if (i==999){
@@ -148,9 +150,13 @@ void LDA_State::update_minibatch(std::vector<int> documents,double tau_0,double 
 
 	sufficient_statistics.cols(word_indices) += expElogtheta_d.t()*(word_cts_vec/phinorm);
 
-	sufficient_statistics = sufficient_statistics % expElogbeta;
 	}
+	
+	sufficient_statistics = sufficient_statistics % expElogbeta;
+	
 	//update word-topic matrix lambda
+	
+	cout << arma::mean(sufficient_statistics) << endl;
 	
 	lambda = lambda * (1-rho_t) + rho_t * (eta + D*sufficient_statistics/batchsize);
 
@@ -171,10 +177,10 @@ void LDA_State::fit_model(int passes,int batchsize,double tau_0,double kappa){
 			docs.push_back(j);
 		}
 
-		/**
+		
 		unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
 		shuffle(docs.begin(), docs.end(), std::default_random_engine(seed));
-		**/
+		
 		
 		int batches=0;
 		while (!docs.empty()){
