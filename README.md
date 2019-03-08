@@ -24,7 +24,7 @@ devtools::install_github("nerskin/lda.svi")
 
 ## TODO:
 
-* Check that the output makes sense 
+* ~~Check that the output makes sense~~
 * Tidy the output
 * Switch to row-major format, or possibly transpose everything. http://minimallysufficient.github.io/r/programming/c++/2018/02/16/profiling-rcpp-packages.html
 * Add documentation/vignette
