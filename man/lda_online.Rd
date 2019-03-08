@@ -2,7 +2,7 @@
 % Please edit documentation in R/lda_online.R
 \name{lda_online}
 \alias{lda_online}
-\title{Fit a Latent Dirichlet Allocation to text data}
+\title{Fit a Latent Dirichlet Allocation model to tidied text data}
 \usage{
 lda_online(dtm, passes = 1, batchsize = 256, K, eta = 1, alpha = 1,
   kappa = 0.7, tau_0 = 1024)
@@ -25,5 +25,5 @@ lda_online(dtm, passes = 1, batchsize = 256, K, eta = 1, alpha = 1,
 \item{tau_0}{learning rate parameter}
 }
 \description{
-Fit a Latent Dirichlet Allocation to text data
+Fit a Latent Dirichlet Allocation model to tidied text data
 }

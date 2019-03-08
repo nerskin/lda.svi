@@ -135,7 +135,6 @@ void LDA_State::update_minibatch(std::vector<int> documents,double tau_0,double 
 
 		  mean_abs_change = arma::mean(arma::abs(gamma_d - gamma_d_old));
 		  if (mean_abs_change < 0.001){
-		    cout << i << endl;
 		    break;
 		  }
 		  if (i==999){
@@ -156,7 +155,7 @@ void LDA_State::update_minibatch(std::vector<int> documents,double tau_0,double 
 	
 	//update word-topic matrix lambda
 	
-	cout << arma::mean(sufficient_statistics) << endl;
+	//cout << arma::mean(sufficient_statistics) << endl;
 	
 	lambda = lambda * (1-rho_t) + rho_t * (eta + D*sufficient_statistics/batchsize);
 
