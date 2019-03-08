@@ -3,7 +3,7 @@
 
 # lda.svi
 
-This R package fits latent dirichlet allocation models to data using the stochastic variational inference method introduced in [this paper](https://papers.nips.cc/paper/3902-online-learning-for-latent-dirichlet-allocation) by Matthew Hoffman and coauthors. This method allows LDA models to be fit considerably faster, and using considerably less memory, than with the previous batch variational Bayes method. As far as I can tell this is the only R package implementing this method. The key functions are implemented in C++ for speed.
+This R package fits latent dirichlet allocation models to data using the stochastic variational inference method introduced in [this paper](https://papers.nips.cc/paper/3902-online-learning-for-latent-dirichlet-allocation) by Matthew Hoffman and coauthors. This method purports to allow LDA models to be fit considerably faster, and using considerably less memory, than with the popular batch variational Bayes method. As far as I can tell this is the only R package implementing this method. The key functions are implemented in C++ for speed.
 
 ## Non-R Dependencies
 
@@ -26,5 +26,6 @@ devtools::install_github("nerskin/lda.svi")
 
 * Check that the output makes sense 
 * Tidy the output
+* Switch to row-major format, or possibly transpose everythin 
 * Add documentation/vignette
 * Submit to CRAN
