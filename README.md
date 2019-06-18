@@ -1,5 +1,4 @@
 ## This is very experimental for now 
-## Current Status: Broken
 
 # lda.svi
 
@@ -26,6 +25,6 @@ devtools::install_github("nerskin/lda.svi")
 
 * ~~Check that the output makes sense~~
 * Tidy the output
-* Switch to row-major format, or possibly transpose everything. http://minimallysufficient.github.io/r/programming/c++/2018/02/16/profiling-rcpp-packages.html
+* Optimize. http://minimallysufficient.github.io/r/programming/c++/2018/02/16/profiling-rcpp-packages.html
 * Add documentation/vignette
 * Submit to CRAN
