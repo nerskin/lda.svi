@@ -200,7 +200,7 @@ void LDA_State::fit_model(int passes,int batchsize,double tau_0,double kappa){
 	
 			}
 			batches++;
-			if (batches % 1000 == 0){
+			if (batches % 10 == 0){
 			  cout << "Processed " << batches << "minibatches" << endl; 
 			}
 		}
