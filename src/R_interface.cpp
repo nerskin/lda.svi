@@ -22,6 +22,8 @@ List lda_online_cpp(IntegerVector doc_ids,IntegerVector terms,IntegerVector coun
 	int D = sort_unique(doc_ids).size();
 	int V = sort_unique(terms).size();
 
+	cout << V << endl;
+
 	LDA_State lda(D,V,K,dtm,eta,alpha);
 
 	cout << "created model object" << endl;

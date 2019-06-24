@@ -11,8 +11,8 @@
 #' @export
 
 lda_online <- function(dtm,passes=1,batchsize=256,K,eta=1/K,alpha=1/K,kappa=0.7,tau_0=1024){
-	docs <- dtm[[1]]
-	terms <- dtm[[2]]
+	docs <- dtm[[2]]
+	terms <- dtm[[1]]
 	counts <- dtm[[3]]
 
 	doc_ids <- seq(0,length(unique(docs)))
@@ -47,6 +47,9 @@ lda_online <- function(dtm,passes=1,batchsize=256,K,eta=1/K,alpha=1/K,kappa=0.7,
 	for (i in seq(1,nrow(lambda))){
 	  beta[i,] <- lambda[i,]/sum(lambda[i,])
 	}
+
+	theta <- reshape2::melt(theta)
+	beta <- reshape2::melt(beta)
 	
 	list('theta'=theta,'beta'=beta,'lambda'=lambda,'gamma'=gamma)#TODO: tidy output 
 }

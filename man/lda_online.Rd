@@ -4,8 +4,8 @@
 \alias{lda_online}
 \title{Fit a Latent Dirichlet Allocation model to tidied text data}
 \usage{
-lda_online(dtm, passes = 1, batchsize = 256, K, eta = 1, alpha = 1,
-  kappa = 0.7, tau_0 = 1024)
+lda_online(dtm, passes = 1, batchsize = 256, K, eta = 1/K,
+  alpha = 1/K, kappa = 0.7, tau_0 = 1024)
 }
 \arguments{
 \item{dtm}{A data frame with three columns. The first column is a vector of document ids (a character vector), the second is a a vector of terms (a character vector), and the third is a vector of counts (an integer vector).}

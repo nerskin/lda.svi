@@ -28,7 +28,7 @@ LDA_State::LDA_State(int n_docs,int vocab_size,int n_topics,std::unordered_map<i
 	alpha = alpha_val;
 
 	gamma = arma::mat(D,K);
-	lambda = arma::mat(K,V);
+	lambda = arma::mat(K,V); 
 
 	Elogbeta = arma::mat(K,V);
 	expElogbeta = arma::mat(K,V);
@@ -126,11 +126,16 @@ void LDA_State::update_minibatch(std::vector<int> documents,double tau_0,double 
 		  //std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		  arma::rowvec gamma_d_old = gamma_d;
 		  gamma_d = alpha + (expElogtheta_d % ((word_cts_vec/phinorm) * expElogbeta_d.t()));
+		  //cout << word_cts_vec.size() << endl;
 		  Elogtheta_d = dirichlet_expectation(gamma_d);
 		  expElogtheta_d = arma::exp(Elogtheta_d);
 
+
 		  phinorm = expElogtheta_d * expElogbeta_d + 1e-100;
 
+		  //cout << phinorm.size() << endl;
+		  //cout << "theta: " << Elogtheta_d.size() << endl;
+		  //cout << "beta: " << expElogbeta_d.size() << endl;
 		 
 
 		  mean_abs_change = arma::mean(arma::abs(gamma_d - gamma_d_old));
@@ -156,10 +161,13 @@ void LDA_State::update_minibatch(std::vector<int> documents,double tau_0,double 
 	//update word-topic matrix lambda
 	
 	//cout << arma::mean(sufficient_statistics) << endl;
-	
+
+	//cout << "lambda rows: " << lambda.n_rows << endl;
+	//cout << "lambda cols: " << lambda.n_cols << endl;
+
 	lambda = lambda * (1-rho_t) + rho_t * (eta + D*sufficient_statistics/batchsize);
 
-
+	//cout << "rho_t: " << rho_t << endl;
 
 	for (int i = 0 ;i< K ;i++){
 		Elogbeta.row(i) = dirichlet_expectation(lambda.row(i));
@@ -204,7 +212,11 @@ void LDA_State::fit_model(int passes,int batchsize,double tau_0,double kappa){
 			  cout << "Processed " << batches << "minibatches" << endl; 
 			}
 		}
-		cout << "Finished a pass" << endl;
+		cout << "Finished pass " << i+1 << endl;
+		//cout << "lambda rows: " << lambda.n_rows << endl;
+		//cout << "lambda cols: " << lambda.n_cols << endl;
+		//exit(1);
+		//cout << gamma << endl;
 	}
 	
 

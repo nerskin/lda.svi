@@ -5,3 +5,7 @@ lda_online_cpp <- function(doc_ids, terms, counts, K, passes, batchsize, tau_0, 
     .Call(`_lda_svi_lda_online_cpp`, doc_ids, terms, counts, K, passes, batchsize, tau_0, kappa, eta, alpha)
 }
 
+lse <- function(log_probs) {
+    .Call(`_lda_svi_lse`, log_probs)
+}
+

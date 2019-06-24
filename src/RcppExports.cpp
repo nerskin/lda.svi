@@ -26,9 +26,21 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// lse
+double lse(const arma::rowvec& log_probs);
+RcppExport SEXP _lda_svi_lse(SEXP log_probsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::rowvec& >::type log_probs(log_probsSEXP);
+    rcpp_result_gen = Rcpp::wrap(lse(log_probs));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_lda_svi_lda_online_cpp", (DL_FUNC) &_lda_svi_lda_online_cpp, 10},
+    {"_lda_svi_lse", (DL_FUNC) &_lda_svi_lse, 1},
     {NULL, NULL, 0}
 };
 
