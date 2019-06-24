@@ -174,9 +174,7 @@ void LDA_State::update_minibatch(std::vector<int> documents,double tau_0,double 
 		expElogbeta.row(i) = arma::exp(Elogbeta.row(i));
 	}
 	
-	if (t % 50 == 0){
-	cout << "finished update function " << t << endl;
-	}
+
 }
 
 void LDA_State::fit_model(int passes,int batchsize,double tau_0,double kappa){
@@ -208,7 +206,7 @@ void LDA_State::fit_model(int passes,int batchsize,double tau_0,double kappa){
 	
 			}
 			batches++;
-			if (batches % 10 == 0){
+			if (batches % 250 == 0){
 			  cout << "Processed " << batches << "minibatches" << endl; 
 			}
 		}

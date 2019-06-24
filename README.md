@@ -24,7 +24,8 @@ devtools::install_github("nerskin/lda.svi")
 ## TODO:
 
 * ~~Check that the output makes sense~~
-* Tidy the output
+* Systematic testing
 * Optimize. http://minimallysufficient.github.io/r/programming/c++/2018/02/16/profiling-rcpp-packages.html
-* Add documentation/vignette
+* Use tidyeval for the interface
+* Add more documentation/vignette
 * Submit to CRAN
