@@ -1,12 +1,7 @@
 #include<vector>
 #include<unordered_set>
-#include<iostream>
-#include<random>
-#include<chrono>
-#include<algorithm>
 #include<cmath>
-#include<stdlib.h>
-#include<thread>
+
 
 
 #include<RcppArmadillo.h>
@@ -15,6 +10,7 @@
 #include "lda_svi.h"
 
 using namespace std;
+using namespace Rcpp;
 
 LDA_State::LDA_State(int n_docs,int vocab_size,int n_topics,std::unordered_map<int,std::unordered_map<int,int>> &data,double eta_val,double alpha_val){
 	D=n_docs;
@@ -45,7 +41,7 @@ LDA_State::LDA_State(int n_docs,int vocab_size,int n_topics,std::unordered_map<i
 	}
 }
 
-void LDA_State::update_minibatch(std::vector<int> documents,double tau_0,double kappa){
+void LDA_State::update_minibatch(std::vector<int> documents,int maxiter,double tau_0,double kappa){
 
 	t++;
 
@@ -119,35 +115,32 @@ void LDA_State::update_minibatch(std::vector<int> documents,double tau_0,double 
 
 	  arma::rowvec phinorm = expElogtheta_d * expElogbeta_d + 1e-100;
 
+		for(int i=0;i<maxiter;i++){
+		  checkUserInterrupt();
 
-		for (int i = 0;i<100;i++){
-		  Rcpp::checkUserInterrupt();
-
-		  //std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		  arma::rowvec gamma_d_old = gamma_d;
-		  gamma_d = alpha + (expElogtheta_d % ((word_cts_vec/phinorm) * expElogbeta_d.t()));
-		  //cout << word_cts_vec.size() << endl;
-		  Elogtheta_d = dirichlet_expectation(gamma_d);
-		  expElogtheta_d = arma::exp(Elogtheta_d);
 
+		  gamma_d = alpha + (expElogtheta_d % ((word_cts_vec/phinorm) * expElogbeta_d.t()));
+
+		  Elogtheta_d = dirichlet_expectation(gamma_d);
+
+		  expElogtheta_d = arma::exp(Elogtheta_d);
 
 		  phinorm = expElogtheta_d * expElogbeta_d + 1e-100;
 
-		  //cout << phinorm.size() << endl;
-		  //cout << "theta: " << Elogtheta_d.size() << endl;
-		  //cout << "beta: " << expElogbeta_d.size() << endl;
-		 
-
 		  mean_abs_change = arma::mean(arma::abs(gamma_d - gamma_d_old));
 		  if (mean_abs_change < 0.001){
+	            Rcout << i << endl;
 		    break;
 		  }
-		  if (i==999){
-			cout << "No convergence!" << endl << endl << endl;
-		  cout << "\a" << endl;
+		  /**
+		  if (i == 9999){
+		    Rcout << "E step failed to converge" << endl;
 		  }
+		  **/
+		
 		}
-		Rcpp::checkUserInterrupt();
+		checkUserInterrupt();
 		
 
 	gamma.row(doc_id) = gamma_d;
@@ -160,14 +153,14 @@ void LDA_State::update_minibatch(std::vector<int> documents,double tau_0,double 
 	
 	//update word-topic matrix lambda
 	
-	//cout << arma::mean(sufficient_statistics) << endl;
 
-	//cout << "lambda rows: " << lambda.n_rows << endl;
-	//cout << "lambda cols: " << lambda.n_cols << endl;
-
+	arma::mat lambda_old = lambda;
+	
 	lambda = lambda * (1-rho_t) + rho_t * (eta + D*sufficient_statistics/batchsize);
 
-	//cout << "rho_t: " << rho_t << endl;
+	Rcout << "max relative change: " << arma::max(arma::max(arma::abs(lambda_old - lambda)/arma::abs(lambda_old))) << endl;
+
+	Rcout << "mean relative change: " << arma::mean(arma::mean(arma::abs(lambda_old-lambda)/arma::abs(lambda_old))) << endl;
 
 	for (int i = 0 ;i< K ;i++){
 		Elogbeta.row(i) = dirichlet_expectation(lambda.row(i));
@@ -177,9 +170,12 @@ void LDA_State::update_minibatch(std::vector<int> documents,double tau_0,double 
 
 }
 
-void LDA_State::fit_model(int passes,int batchsize,double tau_0,double kappa){
+void LDA_State::fit_model(int passes,int batchsize,int maxiter,double tau_0,double kappa){
 	
 	for (int i=0;i<passes;i++){
+
+
+		arma::mat old_lambda = lambda;
 
 		std::vector<int> docs;
 		for (int j=0;j<D;j++){
@@ -197,24 +193,18 @@ void LDA_State::fit_model(int passes,int batchsize,double tau_0,double kappa){
 				std::vector<int> minibatch(docs.end() - batchsize,docs.end());
 				docs.erase(docs.end() - batchsize,docs.end());
 
-				update_minibatch(minibatch,tau_0,kappa);
+				update_minibatch(minibatch,maxiter,tau_0,kappa);
 			}
 			else {
-				cout << "doing a short minibatch"  << endl;
-				update_minibatch(docs,tau_0,kappa);
+				update_minibatch(docs,maxiter,tau_0,kappa);
 				docs.erase(docs.begin(),docs.end());
 	
 			}
 			batches++;
-			if (batches % 250 == 0){
-			  cout << "Processed " << batches << "minibatches" << endl; 
-			}
+
 		}
-		cout << "Finished pass " << i+1 << endl;
-		//cout << "lambda rows: " << lambda.n_rows << endl;
-		//cout << "lambda cols: " << lambda.n_cols << endl;
-		//exit(1);
-		//cout << gamma << endl;
+		Rcout << "Finished pass " << i+1 << endl;
+
 	}
 	
 

@@ -30,8 +30,8 @@ struct LDA_State{
 	public:
 		LDA_State(int D,int V,int K,std::unordered_map<int,std::unordered_map<int,int>> &dtm,double eta,double alpha);
 		void update_minibatch(std::vector<int> documents);
-		void fit_model(int passes,int batchsize,double tau_0,double kappa);
-		void update_minibatch(std::vector<int> docs,double tau_0,double kappa);//this could probably be private
+		void fit_model(int passes,int batchsize,int maxiter,double tau_0,double kappa);
+		void update_minibatch(std::vector<int> docs,int maxiter,double tau_0,double kappa);//this could probably be private
 };
 
 #endif

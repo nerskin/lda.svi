@@ -7,8 +7,8 @@
 using namespace Rcpp;
 
 // lda_online_cpp
-List lda_online_cpp(IntegerVector doc_ids, IntegerVector terms, IntegerVector counts, int K, int passes, int batchsize, double tau_0, double kappa, double eta, double alpha);
-RcppExport SEXP _lda_svi_lda_online_cpp(SEXP doc_idsSEXP, SEXP termsSEXP, SEXP countsSEXP, SEXP KSEXP, SEXP passesSEXP, SEXP batchsizeSEXP, SEXP tau_0SEXP, SEXP kappaSEXP, SEXP etaSEXP, SEXP alphaSEXP) {
+List lda_online_cpp(IntegerVector doc_ids, IntegerVector terms, IntegerVector counts, int K, int passes, int batchsize, int maxiter, double tau_0, double kappa, double eta, double alpha);
+RcppExport SEXP _lda_svi_lda_online_cpp(SEXP doc_idsSEXP, SEXP termsSEXP, SEXP countsSEXP, SEXP KSEXP, SEXP passesSEXP, SEXP batchsizeSEXP, SEXP maxiterSEXP, SEXP tau_0SEXP, SEXP kappaSEXP, SEXP etaSEXP, SEXP alphaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -18,29 +18,18 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type K(KSEXP);
     Rcpp::traits::input_parameter< int >::type passes(passesSEXP);
     Rcpp::traits::input_parameter< int >::type batchsize(batchsizeSEXP);
+    Rcpp::traits::input_parameter< int >::type maxiter(maxiterSEXP);
     Rcpp::traits::input_parameter< double >::type tau_0(tau_0SEXP);
     Rcpp::traits::input_parameter< double >::type kappa(kappaSEXP);
     Rcpp::traits::input_parameter< double >::type eta(etaSEXP);
     Rcpp::traits::input_parameter< double >::type alpha(alphaSEXP);
-    rcpp_result_gen = Rcpp::wrap(lda_online_cpp(doc_ids, terms, counts, K, passes, batchsize, tau_0, kappa, eta, alpha));
-    return rcpp_result_gen;
-END_RCPP
-}
-// lse
-double lse(const arma::rowvec& log_probs);
-RcppExport SEXP _lda_svi_lse(SEXP log_probsSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const arma::rowvec& >::type log_probs(log_probsSEXP);
-    rcpp_result_gen = Rcpp::wrap(lse(log_probs));
+    rcpp_result_gen = Rcpp::wrap(lda_online_cpp(doc_ids, terms, counts, K, passes, batchsize, maxiter, tau_0, kappa, eta, alpha));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_lda_svi_lda_online_cpp", (DL_FUNC) &_lda_svi_lda_online_cpp, 10},
-    {"_lda_svi_lse", (DL_FUNC) &_lda_svi_lse, 1},
+    {"_lda_svi_lda_online_cpp", (DL_FUNC) &_lda_svi_lda_online_cpp, 11},
     {NULL, NULL, 0}
 };
 
