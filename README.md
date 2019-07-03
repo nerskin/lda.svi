@@ -4,6 +4,8 @@
 
 This R package fits latent dirichlet allocation models to data using the stochastic variational inference method introduced in [this paper](https://papers.nips.cc/paper/3902-online-learning-for-latent-dirichlet-allocation) by Matthew Hoffman and coauthors. This method purports to allow LDA models to be fit considerably faster, and using considerably less memory, than with the popular batch variational Bayes method. As far as I can tell this is the only R package implementing this method. The key functions are implemented in C++ for speed.
 
+A somewhat more helpful reference for the method is [this paper](http://www.jmlr.org/papers/volume14/hoffman13a/hoffman13a.pdf), which motivates the algorithms and places it in a broader context.
+
 ## Non-R Dependencies
 
 * A C++ compiler supporting C++11.
