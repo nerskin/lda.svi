@@ -1,8 +1,8 @@
 #include<vector>
 #include<unordered_set>
 #include<cmath>
-
-
+#include<limits.h>
+#include<random>
 
 #include<RcppArmadillo.h>
 
@@ -108,7 +108,7 @@ void LDA_State::update_minibatch(std::vector<int> documents,int maxiter,double t
 	
 	  arma::uvec word_indices(word_ids.size());
 	  for (int i=0;i<word_ids.size();i++){
-	    word_indices[i] = static_cast<unsigned int>(word_ids[i]);//is this right?
+	    word_indices[i] = static_cast<unsigned int>(word_ids[i]);
 	  }
 	  
 	  arma::mat expElogbeta_d = expElogbeta.cols(word_indices);
@@ -129,17 +129,11 @@ void LDA_State::update_minibatch(std::vector<int> documents,int maxiter,double t
 		  phinorm = expElogtheta_d * expElogbeta_d + 1e-100;
 
 		  mean_abs_change = arma::mean(arma::abs(gamma_d - gamma_d_old));
-		  if (mean_abs_change < 0.001){
-	            Rcout << i << endl;
-		    break;
+		  if (i==i && R::runif(0,1) < 0.001){
+			Rcout << mean_abs_change << endl;
 		  }
-		  /**
-		  if (i == 9999){
-		    Rcout << "E step failed to converge" << endl;
-		  }
-		  **/
-		
-		}
+
+		}	
 		checkUserInterrupt();
 		
 
@@ -153,14 +147,7 @@ void LDA_State::update_minibatch(std::vector<int> documents,int maxiter,double t
 	
 	//update word-topic matrix lambda
 	
-
-	arma::mat lambda_old = lambda;
-	
 	lambda = lambda * (1-rho_t) + rho_t * (eta + D*sufficient_statistics/batchsize);
-
-	Rcout << "max relative change: " << arma::max(arma::max(arma::abs(lambda_old - lambda)/arma::abs(lambda_old))) << endl;
-
-	Rcout << "mean relative change: " << arma::mean(arma::mean(arma::abs(lambda_old-lambda)/arma::abs(lambda_old))) << endl;
 
 	for (int i = 0 ;i< K ;i++){
 		Elogbeta.row(i) = dirichlet_expectation(lambda.row(i));
@@ -174,38 +161,26 @@ void LDA_State::fit_model(int passes,int batchsize,int maxiter,double tau_0,doub
 	
 	for (int i=0;i<passes;i++){
 
-
-		arma::mat old_lambda = lambda;
-
 		std::vector<int> docs;
 		for (int j=0;j<D;j++){
 			docs.push_back(j);
 		}
 
-		
-		unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-		shuffle(docs.begin(), docs.end(), std::default_random_engine(seed));
-		
-		
+		unsigned seed = floor(R::runif(0,1)*UINT_MAX);
+		shuffle(docs.begin(), docs.end(),mt19937_64(seed));//64-bit mersenne twister
+	
 		int batches=0;
 		while (!docs.empty()){
 			if (docs.size() >= batchsize){
 				std::vector<int> minibatch(docs.end() - batchsize,docs.end());
 				docs.erase(docs.end() - batchsize,docs.end());
-
 				update_minibatch(minibatch,maxiter,tau_0,kappa);
 			}
 			else {
 				update_minibatch(docs,maxiter,tau_0,kappa);
 				docs.erase(docs.begin(),docs.end());
-	
 			}
 			batches++;
-
 		}
-		Rcout << "Finished pass " << i+1 << endl;
-
 	}
-	
-
 }

@@ -9,6 +9,7 @@
 #' @param kappa learning rate parameter. Lower values give greater weight to later iterations. For guaranteed convergence to a local optimum, kappa must lie in the interval (0.5,1].
 #' @param tau_0 learning rate parameter. Higher values reduce the influence of early iterations.
 #' @param K The number of topics
+#' @importFrom methods is
 #' @export
 
 lda_svi <- function(dtm,passes=1,batchsize=256,maxiter=100,K,eta=1/K,alpha=1/K,kappa=0.7,tau_0=1024){

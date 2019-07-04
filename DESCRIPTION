@@ -1,16 +1,22 @@
 Package: lda.svi
 Title: Fit Latent Dirichlet Allocations Models using Stochastic Variational Inference
-Version: 0.0.0.9000
+Version: 0.1.0
 Authors@R: person("Nicholas", "Erskine", email = "nicholas.erskine95@gmail.com", role = c("aut", "cre"))
-Description: Fits Latent Dirichlet Allocation models to text data efficiently using the algorithm introduced in Hoffman et al. (2011) <https://papers.nips.cc/paper/3902-online-learning-for-latent-dirichlet-allocation>.
-Depends: R (>= 3.4.4)
+Description: Fits Latent Dirichlet Allocation models to text data efficiently using the algorithm introduced by Hoffman et al. (2010) <https://papers.nips.cc/paper/3902-online-learning-for-latent-dirichlet-allocation>.
+Depends: R (>= 3.6.0)
 License: MIT + file LICENSE
+BugReports: https://github.com/nerskin/lda.svi/issues
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.1.1
 LinkingTo: 
     Rcpp,
-    RcppArmadillo
+    RcppArmadillo,
+    BH
 Imports: 
-    Rcpp
+    Rcpp,
+    reshape2,
+    slam,
+    tm (>= 0.6),
+    methods
 SystemRequirements: C++11
