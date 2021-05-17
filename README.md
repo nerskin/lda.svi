@@ -14,7 +14,7 @@ The interface is designed with Hadley Wickham's [tidy data principles](https://v
 
 ## Installation
 
-I intend to submit this to the CRAN soon, but in the meantime you can install it by running
+I might submit this to the CRAN at some point, but in the meantime you can install it by running
 
 ```{r}
 #install.packages('devtools')
