@@ -1,5 +1,5 @@
 #ifndef _lda_svi_guard
-#define _lda_csv_guard
+#define _lda_svi_guard
 
 #include<unordered_map>
 #include <RcppArmadillo.h>
